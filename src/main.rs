@@ -1,10 +1,12 @@
 mod api;
 mod chat;
 mod config;
+mod tools;
 mod ui;
 
 use anyhow::Result;
 use chat::ChatSession;
+use tools::ToolsClient;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -16,6 +18,33 @@ async fn main() -> Result<()> {
     };
 
     let mut session = ChatSession::new(api_key, config.verbose);
+
+    // 尝试连接工具服务
+    let tools_addr = config
+        .tools_addr
+        .unwrap_or_else(|| "http://[::1]:50051".to_string());
+    match ToolsClient::connect(&tools_addr).await {
+        Ok(client) => {
+            session.set_tools_client(client);
+            ui::print_debug("已连接到工具服务");
+
+            // 添加系统提示，告知 AI 可以使用工具
+            session.add_system_message(
+                "你可以使用以下格式调用工具：\n\
+                ```tool\n\
+                {\"name\": \"工具名称\", \"args\": {\"参数名\": \"参数值\"}}\n\
+                ```\n\
+                例如：\n\
+                ```tool\n\
+                {\"name\": \"file_analyzer\", \"args\": {\"path\": \"/tmp\", \"recursive\": true}}\n\
+                ```".to_string()
+            );
+        }
+        Err(e) => {
+            ui::print_debug(&format!("无法连接到工具服务: {}", e));
+            ui::print_debug("将以普通对话模式运行");
+        }
+    }
 
     ui::print_welcome();
 

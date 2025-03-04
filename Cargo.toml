@@ -3,6 +3,10 @@ name = "rust_agent"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "tools_server"
+path = "src/bin/tools_server.rs"
+
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
 reqwest = { version = "0.11", features = ["json"] }
@@ -13,3 +17,10 @@ colored = "2.0"
 indicatif = "0.17"
 dialoguer = "0.11"
 anyhow = "1.0"
+arrow = "54.2.1"
+arrow-flight = "54.2.1"
+futures = "0.3"
+tonic = "0.12.3"
+prost = "0.13.5"
+async-trait = "0.1"
+regex = "1.10.2"

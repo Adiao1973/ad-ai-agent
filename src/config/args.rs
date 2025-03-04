@@ -10,6 +10,10 @@ pub struct Args {
     /// 是否显示详细信息
     #[arg(short, long, default_value_t = false)]
     pub verbose: bool,
+
+    /// 工具服务地址
+    #[arg(short, long)]
+    pub tools_addr: Option<String>,
 }
 
 impl Args {
