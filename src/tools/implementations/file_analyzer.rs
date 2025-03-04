@@ -55,31 +55,32 @@ impl FileAnalyzerTool {
                 }
 
                 // 记录大文件
-                analysis
-                    .largest_files
-                    .push((entry.path().to_string_lossy().to_string(), file_size));
+                let path_str = entry.path().to_string_lossy().to_string();
+                analysis.largest_files.push((path_str, file_size));
                 analysis
                     .largest_files
                     .sort_by_key(|(_, size)| std::cmp::Reverse(*size));
                 analysis.largest_files.truncate(5); // 只保留最大的5个文件
             } else if metadata.is_dir() && recursive {
-                // 递归分析子目录
-                if let Ok(sub_analysis) = self.analyze_directory(&entry.path(), recursive).await {
-                    analysis.total_size += sub_analysis.total_size;
-                    analysis.file_count += sub_analysis.file_count;
+                // 递归分析子目录 - 使用 Box::pin 避免无限大小的 Future
+                let entry_path = entry.path();
+                let sub_analysis_future = self.analyze_directory(&entry_path, recursive);
+                let sub_analysis = Box::pin(sub_analysis_future).await?;
 
-                    // 合并扩展名统计
-                    for (ext, count) in sub_analysis.extension_stats {
-                        *analysis.extension_stats.entry(ext).or_insert(0) += count;
-                    }
+                analysis.total_size += sub_analysis.total_size;
+                analysis.file_count += sub_analysis.file_count;
 
-                    // 更新最大文件列表
-                    analysis.largest_files.extend(sub_analysis.largest_files);
-                    analysis
-                        .largest_files
-                        .sort_by_key(|(_, size)| std::cmp::Reverse(*size));
-                    analysis.largest_files.truncate(5);
+                // 合并扩展名统计
+                for (ext, count) in sub_analysis.extension_stats {
+                    *analysis.extension_stats.entry(ext).or_insert(0) += count;
                 }
+
+                // 更新最大文件列表
+                analysis.largest_files.extend(sub_analysis.largest_files);
+                analysis
+                    .largest_files
+                    .sort_by_key(|(_, size)| std::cmp::Reverse(*size));
+                analysis.largest_files.truncate(5);
             }
         }
 

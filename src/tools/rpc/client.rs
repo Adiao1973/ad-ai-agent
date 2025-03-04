@@ -1,8 +1,5 @@
 use anyhow::Result;
-use arrow_flight::{
-    flight_service_client::FlightServiceClient, Action, Criteria, FlightDescriptor,
-    HandshakeRequest,
-};
+use arrow_flight::{flight_service_client::FlightServiceClient, Action, Criteria};
 use tonic::transport::Channel;
 
 use crate::tools::interface::{ToolParameters, ToolResult};
@@ -25,9 +22,8 @@ impl ToolsClient {
         let mut tools = Vec::new();
         while let Some(flight_info) = stream.message().await? {
             if let Some(descriptor) = flight_info.flight_descriptor {
-                if let Some(cmd) = descriptor.cmd {
-                    tools.push(String::from_utf8(cmd)?);
-                }
+                let cmd = descriptor.cmd;
+                tools.push(String::from_utf8(cmd.to_vec())?);
             }
         }
 
@@ -37,7 +33,7 @@ impl ToolsClient {
     pub async fn execute_tool(&mut self, params: ToolParameters) -> Result<ToolResult> {
         let action = Action {
             r#type: "execute".into(),
-            body: serde_json::to_vec(&params)?,
+            body: serde_json::to_vec(&params)?.into(),
         };
 
         let request = tonic::Request::new(action);
@@ -45,7 +41,7 @@ impl ToolsClient {
         let mut stream = response.into_inner();
 
         if let Some(result) = stream.message().await? {
-            let tool_result: ToolResult = serde_json::from_slice(&result.body)?;
+            let tool_result: ToolResult = serde_json::from_slice(&result.body.to_vec())?;
             Ok(tool_result)
         } else {
             anyhow::bail!("No result received from tool execution")

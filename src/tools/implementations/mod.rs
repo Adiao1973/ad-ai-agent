@@ -1,3 +1,1 @@
-mod file_analyzer;
-
-pub use file_analyzer::FileAnalyzerTool;
+pub mod file_analyzer;
