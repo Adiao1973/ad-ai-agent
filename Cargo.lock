@@ -1880,19 +1880,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "rust_agent"
+name = "rust_agent_cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "colored",
+ "dialoguer",
+ "indicatif",
+ "rust_agent_core",
+ "tokio",
+]
+
+[[package]]
+name = "rust_agent_core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "arrow",
  "arrow-flight",
  "async-trait",
- "clap",
- "colored",
- "dialoguer",
  "futures",
- "indicatif",
- "prost",
  "regex",
  "reqwest",
  "serde",
@@ -2301,6 +2309,21 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
+]
+
+[[package]]
+name = "tools_server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "arrow",
+ "arrow-flight",
+ "async-trait",
+ "futures",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tonic",
 ]
 
 [[package]]

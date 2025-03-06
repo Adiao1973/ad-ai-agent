@@ -7,23 +7,23 @@ pub struct ChatMessage {
 }
 
 #[derive(Debug, Serialize)]
-pub(crate) struct ChatRequest {
+pub struct ChatRequest {
     pub model: String,
     pub messages: Vec<ChatMessage>,
     pub temperature: f32,
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct ChatResponse {
+pub struct ChatResponse {
     pub choices: Vec<Choice>,
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct Choice {
+pub struct Choice {
     pub message: Message,
 }
 
 #[derive(Debug, Deserialize)]
-pub(crate) struct Message {
+pub struct Message {
     pub content: String,
 }

@@ -1,12 +1,10 @@
-mod api;
 mod chat;
 mod config;
-mod tools;
 mod ui;
 
 use anyhow::Result;
 use chat::ChatSession;
-use tools::ToolsClient;
+use rust_agent_core::tools::ToolsClient;
 
 #[tokio::main]
 async fn main() -> Result<()> {

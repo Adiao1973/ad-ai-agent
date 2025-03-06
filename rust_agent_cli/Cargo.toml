@@ -1,0 +1,13 @@
+[package]
+name = "rust_agent_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+tokio = { workspace = true }
+clap = { workspace = true }
+dialoguer = { workspace = true }
+colored = { workspace = true }
+indicatif = { workspace = true }
+rust_agent_core = { path = "../rust_agent_core" }

@@ -2,8 +2,10 @@ use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
-use crate::api::{ChatMessage, DeepseekClient};
-use crate::tools::{format_tool_result, parse_tool_calls, ToolParameters, ToolResult, ToolsClient};
+use rust_agent_core::api::{ChatMessage, DeepseekClient};
+use rust_agent_core::tools::{
+    format_tool_result, parse_tool_calls, ToolParameters, ToolResult, ToolsClient,
+};
 
 pub struct ChatSession {
     client: DeepseekClient,

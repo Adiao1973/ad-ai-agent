@@ -1,3 +1,4 @@
 target/
 .cursorrules
 token
+.DS_Store
