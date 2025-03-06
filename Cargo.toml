@@ -3,8 +3,9 @@ members = ["rust_agent_core", "rust_agent_cli", "tools_server"]
 
 [workspace.dependencies]
 clap = { version = "4.4", features = ["derive"] }
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", features = ["stream", "json"] }
 tokio = { version = "1.0", features = ["full"] }
+tokio-stream = { version = "0.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 colored = "2.0"
@@ -14,6 +15,7 @@ anyhow = "1.0"
 arrow = "54.2.1"
 arrow-flight = "54.2.1"
 futures = "0.3"
+futures-util = "0.3"
 tonic = "0.12.3"
 prost = "0.13.5"
 async-trait = "0.1"

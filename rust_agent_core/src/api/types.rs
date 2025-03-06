@@ -11,19 +11,34 @@ pub struct ChatRequest {
     pub model: String,
     pub messages: Vec<ChatMessage>,
     pub temperature: f32,
+    pub stream: bool,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct ChatResponse {
-    pub choices: Vec<Choice>,
+    pub choices: Vec<ResponseChoice>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Choice {
+pub struct ResponseChoice {
     pub message: Message,
 }
 
 #[derive(Debug, Deserialize)]
+pub struct ChatStreamResponse {
+    pub choices: Vec<StreamChoice>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct StreamChoice {
+    pub delta: Message,
+    pub finish_reason: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Message {
+    #[serde(default)]
+    pub role: Option<String>,
+    #[serde(default)]
     pub content: String,
 }

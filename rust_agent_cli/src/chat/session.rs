@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use futures_util::StreamExt;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -55,43 +56,54 @@ impl ChatSession {
         });
     }
 
-    /// 获取 AI 响应并处理工具调用
-    pub async fn get_response(&self) -> Result<String> {
-        let response = self.client.chat(self.messages.clone()).await?;
+    /// 获取 AI 响应并处理工具调用（流式输出）
+    pub async fn get_response_stream<F>(&self, mut callback: F) -> Result<String>
+    where
+        F: FnMut(&str),
+    {
+        let mut stream = self.client.chat_stream(self.messages.clone()).await?;
+        let mut full_response = String::new();
 
-        // 如果没有工具客户端，直接返回响应
-        if self.tools_client.is_none() {
-            return Ok(response);
-        }
-
-        // 解析工具调用
-        let tool_calls = parse_tool_calls(&response);
-        if tool_calls.is_empty() {
-            return Ok(response);
-        }
-
-        // 执行工具调用
-        let mut result_content = response.clone();
-        for tool_params in tool_calls {
-            let tool_name = tool_params.name.clone();
-
-            // 执行工具
-            match self.execute_tool(tool_params).await {
-                Ok(result) => {
-                    // 格式化结果并添加到响应中
-                    let result_text = format_tool_result(&tool_name, &result);
-                    result_content.push_str("\n\n");
-                    result_content.push_str(&result_text);
-                }
-                Err(e) => {
-                    // 添加错误信息
-                    result_content.push_str("\n\n");
-                    result_content.push_str(&format!("工具 `{}` 执行失败: {}", tool_name, e));
-                }
+        while let Some(chunk) = stream.next().await {
+            let content = chunk?;
+            if !content.is_empty() {
+                callback(&content);
+                full_response.push_str(&content);
             }
         }
 
-        Ok(result_content)
+        // 检查是否包含工具调用
+        let tool_calls = parse_tool_calls(&full_response);
+        if !tool_calls.is_empty() && self.tools_client.is_some() {
+            let mut result_content = full_response.clone();
+
+            // 逐个执行工具调用
+            for tool_params in tool_calls {
+                let tool_name = tool_params.name.clone();
+                callback(&format!("\n执行工具 `{}`...\n", tool_name));
+
+                match self.execute_tool(tool_params).await {
+                    Ok(result) => {
+                        let result_text = format_tool_result(&tool_name, &result);
+                        result_content.push_str("\n\n");
+                        result_content.push_str(&result_text);
+                        callback("\n\n");
+                        callback(&result_text);
+                    }
+                    Err(e) => {
+                        let error_text = format!("工具 `{}` 执行失败: {}", tool_name, e);
+                        result_content.push_str("\n\n");
+                        result_content.push_str(&error_text);
+                        callback("\n\n");
+                        callback(&error_text);
+                    }
+                }
+            }
+
+            Ok(result_content)
+        } else {
+            Ok(full_response)
+        }
     }
 
     /// 执行工具调用

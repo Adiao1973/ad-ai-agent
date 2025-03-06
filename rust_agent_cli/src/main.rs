@@ -4,7 +4,9 @@ mod ui;
 
 use anyhow::Result;
 use chat::ChatSession;
+use colored::Colorize;
 use rust_agent_core::tools::ToolsClient;
+use std::io::{self, Write};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -55,15 +57,22 @@ async fn main() -> Result<()> {
 
         session.add_user_message(user_input);
 
-        let pb = ui::create_progress_bar("等待 Deepseek 响应中...");
-        match session.get_response().await {
+        print!("{}: ", "Deepseek".blue());
+        io::stdout().flush()?;
+
+        match session
+            .get_response_stream(|chunk| {
+                print!("{}", chunk);
+                io::stdout().flush().unwrap();
+            })
+            .await
+        {
             Ok(response) => {
-                pb.finish_and_clear();
-                ui::print_assistant_message(&response);
+                println!();
                 session.add_assistant_message(response);
             }
             Err(e) => {
-                pb.finish_and_clear();
+                println!();
                 ui::print_error(&e.to_string());
                 session.remove_last_message();
             }

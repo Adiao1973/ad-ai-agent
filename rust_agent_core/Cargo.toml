@@ -12,6 +12,7 @@ arrow-flight = { workspace = true }
 tonic = { workspace = true }
 futures = { workspace = true }
 tokio = { workspace = true }
+tokio-stream = { workspace = true }
 regex = { workspace = true }
 async-trait = { workspace = true }
 reqwest = { workspace = true }
