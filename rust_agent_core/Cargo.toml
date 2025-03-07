@@ -16,3 +16,7 @@ tokio-stream = { workspace = true }
 regex = { workspace = true }
 async-trait = { workspace = true }
 reqwest = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+tracing-appender = { workspace = true }
+time = { workspace = true }

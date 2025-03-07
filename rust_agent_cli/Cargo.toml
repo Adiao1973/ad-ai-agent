@@ -12,4 +12,5 @@ colored = { workspace = true }
 indicatif = { workspace = true }
 futures = { workspace = true }
 futures-util = { workspace = true }
+tracing = { workspace = true }
 rust_agent_core = { path = "../rust_agent_core" }

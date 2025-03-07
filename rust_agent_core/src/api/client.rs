@@ -1,6 +1,5 @@
 use anyhow::Result;
 use futures::Stream;
-use std::sync::{Arc, Mutex};
 use tokio_stream::StreamExt;
 
 use super::types::{ChatMessage, ChatRequest, ChatResponse, ChatStreamResponse};

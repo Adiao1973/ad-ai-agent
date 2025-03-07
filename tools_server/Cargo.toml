@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rust_agent_core = { path = "../rust_agent_core" }
 anyhow = { workspace = true }
-arrow-flight = { workspace = true }
-arrow = { workspace = true }
-async-trait = { workspace = true }
-serde = { workspace = true }
-serde_json = { workspace = true }
 tokio = { workspace = true }
 tonic = { workspace = true }
+arrow-flight = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
 futures = { workspace = true }
+tracing = { workspace = true }
+rust_agent_core = { path = "../rust_agent_core" }
