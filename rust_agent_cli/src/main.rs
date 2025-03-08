@@ -109,12 +109,19 @@ async fn main() -> Result<()> {
         info!("User input: {}", user_input);
         session.add_user_message(user_input);
 
-        print!("{}: ", "Deepseek".blue());
-        io::stdout().flush()?;
+        // 创建加载动画
+        let spinner = ui::create_spinner("Deepseek: 思考中...", true);
+        let mut is_first_chunk = true;
 
         match session
             .get_response_stream(|chunk| {
-                print!("{}", chunk);
+                if is_first_chunk {
+                    spinner.finish_and_clear(); // 在第一个响应到达时清除加载动画
+                    print!("{}: {}", "Deepseek".blue(), chunk);
+                    is_first_chunk = false;
+                } else {
+                    print!("{}", chunk);
+                }
                 io::stdout().flush().unwrap();
             })
             .await
@@ -125,6 +132,7 @@ async fn main() -> Result<()> {
                 session.add_assistant_message(response);
             }
             Err(e) => {
+                spinner.finish_and_clear(); // 确保在出错时也清除加载动画
                 println!();
                 error!("Failed to get assistant response: {}", e);
                 ui::print_error(&e.to_string());
