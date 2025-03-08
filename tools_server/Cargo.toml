@@ -14,3 +14,5 @@ async-trait = { workspace = true }
 futures = { workspace = true }
 tracing = { workspace = true }
 rust_agent_core = { path = "../rust_agent_core" }
+reqwest = { workspace = true }
+urlencoding = { workspace = true }

@@ -49,14 +49,45 @@ async fn main() -> Result<()> {
 
             // 添加系统提示，告知 AI 可以使用工具
             session.add_system_message(
-                "你可以使用以下格式调用工具：\n\
-                ```tool\n\
-                {\"name\": \"工具名称\", \"args\": {\"参数名\": \"参数值\"}}\n\
-                ```\n\
-                例如：\n\
-                ```tool\n\
-                {\"name\": \"file_analyzer\", \"args\": {\"path\": \"/tmp\", \"recursive\": true}}\n\
-                ```".to_string()
+                "你可以使用以下工具来辅助完成任务：
+
+1. 文件分析工具 (file_analyzer)：
+   - 功能：分析指定目录下的文件信息，包括大小、类型统计等
+   - 参数：
+     - path: 要分析的目录路径（字符串）
+     - recursive: 是否递归分析子目录（布尔值）
+   - 示例：
+   ```tool
+   {\"name\": \"file_analyzer\", \"args\": {\"path\": \"/tmp\", \"recursive\": true}}
+   ```
+   - 返回信息：
+     - total_size: 总文件大小
+     - file_count: 文件数量
+     - extension_stats: 文件扩展名统计
+     - largest_files: 最大的5个文件
+
+2. 网络搜索工具 (web_search)：
+   - 功能：在互联网上搜索信息，返回相关结果
+   - 参数：
+     - query: 搜索查询词（字符串）
+     - max_results: 最大结果数量（可选，默认5）
+   - 示例：
+   ```tool
+   {\"name\": \"web_search\", \"args\": {\"query\": \"Rust 编程语言\", \"max_results\": 5}}
+   ```
+   - 返回信息：
+     - query: 搜索查询词
+     - results: 搜索结果列表，每个结果包含：
+       - title: 标题
+       - link: 链接
+       - snippet: 摘要
+
+注意事项：
+1. 工具调用必须使用上述 JSON 格式
+2. 参数名称和类型必须严格匹配
+3. 每个工具都有特定的用途，请根据实际需求选择合适的工具
+4. 如果工具执行失败，会返回错误信息"
+                    .to_string(),
             );
         }
         Err(e) => {
