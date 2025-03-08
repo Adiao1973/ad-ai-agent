@@ -66,7 +66,44 @@ async fn main() -> Result<()> {
      - extension_stats: 文件扩展名统计
      - largest_files: 最大的5个文件
 
-2. 网络搜索工具 (web_search)：
+2. 文件处理工具 (file_tool)：
+   - 功能：处理各种文件操作，包括格式转换、压缩解压等
+   - 参数：
+     - operation: 操作类型
+       - convert: 格式转换
+       - compress: 压缩文件（未实现）
+       - decompress: 解压文件（未实现）
+       - rename: 重命名（未实现）
+       - organize: 文件整理（未实现）
+     - input: 输入文件路径
+     - output: 输出路径（可选）
+     - options: 选项（可选）
+       - format: 目标格式
+       - quality: 质量设置（high/medium/low）
+       - page_range: 页面范围
+       - extra_args: 额外参数
+   - 示例：
+   ```tool
+   {\"name\": \"file_tool\", \"args\": {
+     \"operation\": \"convert\",
+     \"input\": \"document.docx\",
+     \"output\": \"document.pdf\",
+     \"options\": {
+       \"format\": \"pdf\",
+       \"quality\": \"high\"
+     }
+   }}
+   ```
+   - 返回信息：
+     - success: 是否成功
+     - message: 处理结果消息
+     - output_path: 输出文件路径
+     - details: 处理详情
+       - original_size: 原始大小
+       - processed_size: 处理后大小
+       - processing_time: 处理时间
+
+3. 网络搜索工具 (web_search)：
    - 功能：在互联网上搜索信息，返回相关结果
    - 参数：
      - query: 搜索查询词（字符串）
@@ -86,7 +123,12 @@ async fn main() -> Result<()> {
 1. 工具调用必须使用上述 JSON 格式
 2. 参数名称和类型必须严格匹配
 3. 每个工具都有特定的用途，请根据实际需求选择合适的工具
-4. 如果工具执行失败，会返回错误信息"
+4. 如果工具执行失败，会返回错误信息
+5. 文件处理工具需要系统安装相应的命令行工具：
+   - 文档转换：LibreOffice (soffice)
+   - 图片处理：ImageMagick (convert)
+   - 音视频处理：FFmpeg (ffmpeg)
+   - PDF处理：Ghostscript (gs)"
                     .to_string(),
             );
         }

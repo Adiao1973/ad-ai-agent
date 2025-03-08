@@ -9,7 +9,7 @@ use rust_agent_core::{
 use tonic::transport::Server;
 use tracing::{error, info, Level};
 
-use crate::tools::{FileAnalyzerTool, WebSearchTool};
+use crate::tools::{FileAnalyzerTool, FileTool, WebSearchTool};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -36,6 +36,14 @@ async fn main() -> Result<()> {
         .register_tool(Box::new(FileAnalyzerTool::new()))
         .await;
     info!("已注册文件分析工具");
+
+    // 注册文件处理工具
+    if let Ok(file_tool) = FileTool::new() {
+        service.register_tool(Box::new(file_tool)).await;
+        info!("已注册文件处理工具");
+    } else {
+        error!("文件处理工具初始化失败");
+    }
 
     // 注册网络搜索工具
     service.register_tool(Box::new(WebSearchTool::new())).await;
